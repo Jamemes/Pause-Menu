@@ -34,10 +34,11 @@ function MenuManager:toggle_menu_state()
 				self:close_menu("menu_pause")
 				managers.savefile:save_setting(true)
 			end
-		elseif (not self:active_menu() or #self:active_menu().logic._node_stack == 1 or not managers.menu:active_menu().logic:selected_node() or managers.menu:active_menu().logic:selected_node():parameters().allow_pause_menu) and managers.menu_component:input_focus() ~= true then
+		elseif (not self:active_menu() or #self:active_menu().logic._node_stack == 1 or not managers.menu:active_menu().logic:selected_node() or managers.menu:active_menu().logic:selected_node():parameters().allow_pause_menu) and (managers.menu_component:input_focus() ~= true or managers.menu_component:input_focus() ~= 1) then
 			self:open_menu("menu_pause")
 
-		if managers.network:session() and managers.network:session():amount_of_players() == 1 then
+		if managers.network:session() and table.size(managers.network:session()._peers) == 0 then
+		
 				Application:set_pause(true)
 				self:post_event("game_pause_in_game_menu")
 				SoundDevice:set_rtpc("ingame_sound", 0)
@@ -53,7 +54,7 @@ function MenuManager:toggle_menu_state()
 end
 
 function MenuCallbackHandler:is_alone()
-	return managers.network:session() and managers.network:session():amount_of_players() == 1
+	return managers.network:session() and table.size(managers.network:session()._peers) == 0
 end
 
 local data = MenuCallbackHandler.restart_level_visible
